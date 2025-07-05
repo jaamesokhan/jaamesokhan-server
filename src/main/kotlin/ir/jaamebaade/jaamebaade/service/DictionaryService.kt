@@ -12,7 +12,7 @@ class DictionaryService(
 ) {
     @Cacheable(value = ["wordMeaning"], key = "#wordMeaningRequest.word")
     fun getWordMeaning(wordMeaningRequest: WordMeaningRequest): WordDto? {
-        val words = wordRepository.findAllByName(wordMeaningRequest.word)
+        val words = wordRepository.findAllByName(normalizeWord(wordMeaningRequest.word))
         if (words.isEmpty())
             return WordDto(
                 name = wordMeaningRequest.word,
@@ -24,6 +24,9 @@ class DictionaryService(
             meaning = words.map { it.meaning }.joinToString { it + '\n' }.trim()
         )
         return wordDto
+    }
 
+    private fun normalizeWord(word: String): String {
+        return word.replace(Regex("[\\u064B-\\u0652]"), "")
     }
 }
