@@ -1,29 +1,14 @@
-# ---- Stage 1: Build JAR ----
-FROM maven:3.9-amazoncorretto-21-debian AS build
+FROM ghcr.io/graalvm/graalvm-community:21.0.2 AS native-maven
+RUN apt-get update && apt-get install -y maven && rm -rf /var/lib/apt/lists/*
+RUN gu install native-image
 WORKDIR /app
 COPY . .
-RUN mvn -B -DskipTests clean package spring-boot:repackage
+# This triggers the native plugin because of -Pnative
+RUN mvn -B -DskipTests -Pnative clean package
 
-# ---- Stage 2: Build Native Executable ----
-FROM ghcr.io/graalvm/graalvm-community:21.0.2 AS native-builder
+FROM debian:bookworm-slim
 WORKDIR /app
-
-# Copy fat JAR
-COPY --from=build /app/target/*.jar app.jar
-
-# Install native-image tool
-RUN gu install native-image
-
-# Build native executable (no fallback, static binary)
-RUN native-image \
-    --no-fallback \
-    --enable-url-protocols=http,https \
-    --install-exit-handlers \
-    -jar app.jar app
-
-# ---- Stage 3: Minimal Runtime ----
-FROM debian:bookworm-slim AS runtime
-WORKDIR /app
-COPY --from=native-builder /app/app .
+# The native binary name is usually your artifactId (e.g., jaamebaade)
+COPY --from=native-maven /app/target/jaamebaade /app/app
 EXPOSE 8080
 ENTRYPOINT ["./app"]
