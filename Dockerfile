@@ -1,39 +1,29 @@
-# Start with a base image containing Java runtime and Maven
-FROM registry.docker.ir/maven:3.9-amazoncorretto-21-debian AS build
+# ---- Stage 1: Build JAR ----
+FROM maven:3.9-amazoncorretto-21-debian AS build
+WORKDIR /app
+COPY . .
+RUN mvn -B -DskipTests clean package spring-boot:repackage
 
-# Make source folder
-RUN mkdir -p /workspace
-
-WORKDIR /workspace
-
-# Copy the pom.xml file and download dependencies
-COPY pom.xml ./
-RUN mvn dependency:go-offline
-
-
-# Copy the source code
-COPY src src
-
-# Builds the application and stores it in /target
-RUN mvn package -DskipTests
-
-# A new stage so that we won't need maven in the final image
-FROM registry.docker.ir/openjdk:21
-
-# Make application folder
-RUN mkdir -p /app
-
+# ---- Stage 2: Build Native Executable ----
+FROM ghcr.io/graalvm/graalvm-community:21.0.2 AS native-builder
 WORKDIR /app
 
-# Copy the jar file from the previous stage
-COPY --from=build /workspace/target/*.jar app.jar
+# Copy fat JAR
+COPY --from=build /app/target/*.jar app.jar
 
-# Add the application.properties file to the container
-COPY ./application.properties /app/config/application.properties
+# Install native-image tool
+RUN gu install native-image
 
-# Set environment variables to define the location of application.properties
-ENV SPRING_CONFIG_LOCATION=classpath:/application.properties,/app/config/application.properties
+# Build native executable (no fallback, static binary)
+RUN native-image \
+    --no-fallback \
+    --enable-url-protocols=http,https \
+    --install-exit-handlers \
+    -jar app.jar app
 
-
-# Run the jar file
-ENTRYPOINT ["java","-jar","app.jar"]
+# ---- Stage 3: Minimal Runtime ----
+FROM debian:bookworm-slim AS runtime
+WORKDIR /app
+COPY --from=native-builder /app/app .
+EXPOSE 8080
+ENTRYPOINT ["./app"]
