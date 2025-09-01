@@ -15,7 +15,7 @@ RUN mvn dependency:go-offline
 COPY src src
 
 # Builds the application and stores it in /target
-RUN mvn -DskipTests -Pnative native-image:compile
+RUN mvn -DskipTests -Pnative native:compile
 
 # A new stage so that we won't need maven in the final image
 # FROM registry.docker.ir/openjdk:21
