@@ -7,7 +7,7 @@ import ir.jaamebaade.request.UserUpdateRequest
 import org.springframework.stereotype.Service
 
 @Service
-class UserService(
+open class UserService(
     private val userRepository: UserRepository,
     private val poetRepository: PoetRepository,
 ) {

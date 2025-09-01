@@ -13,7 +13,7 @@ import java.util.*
 import java.util.function.Function
 
 @Service
-class JwtService {
+open class JwtService {
     @Value("\${security.jwt.secret-key}")
     private val secretKey: String? = null
 

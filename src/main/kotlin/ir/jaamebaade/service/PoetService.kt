@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service
 import java.util.concurrent.TimeUnit
 
 @Service
-class PoetService(
+open class PoetService(
     private val poetRepository: PoetRepository,
     private val minioClient: MinioClient,
 ) {
@@ -20,7 +20,7 @@ class PoetService(
     val bucketName: String? = null
 
     @Cacheable(value = ["poetList"], key = "#pageable.pageNumber + '-' + #pageable.pageSize + '-' + #name")
-    fun listPoets(pageable: Pageable, name: String?): Page<PoetDto> {
+    open fun listPoets(pageable: Pageable, name: String?): Page<PoetDto> {
         val poetDtoList = if (name.isNullOrEmpty()) {
             poetRepository.findAllByOrderById(pageable)
         } else {
