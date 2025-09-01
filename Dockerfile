@@ -1,5 +1,5 @@
 # Start with a base image containing Java runtime and Maven
-FROM registry.docker.ir/maven:3.9-amazoncorretto-21-debian AS build
+FROM maven:3.9-amazoncorretto-21-debian AS build
 
 # Make source folder
 RUN mkdir -p /workspace
@@ -15,7 +15,7 @@ RUN mvn dependency:go-offline
 COPY src src
 
 # Builds the application and stores it in /target
-RUN mvn -DskipTests -Pnative spring-boot:build-imag
+RUN mvn -DskipTests -Pnative spring-boot:build-image
 
 # A new stage so that we won't need maven in the final image
 # FROM registry.docker.ir/openjdk:21
