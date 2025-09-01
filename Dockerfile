@@ -14,7 +14,7 @@ WORKDIR /workspace
 # Also pre-copy just the pom to warm dependency cache.
 COPY pom.xml ./
 RUN --mount=type=cache,target=/root/.m2 \
-    mvn -q -e -DskipTests dependency:go-offline
+    mvn -q -e -DskipTests -Pnative package
 
 # Now copy sources
 COPY src ./src
