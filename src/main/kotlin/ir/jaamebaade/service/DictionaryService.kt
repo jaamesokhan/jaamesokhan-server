@@ -7,11 +7,11 @@ import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Service
 
 @Service
-class DictionaryService(
+open class DictionaryService(
     private val wordRepository: WordRepository,
 ) {
     @Cacheable(value = ["wordMeaning"], key = "#wordMeaningRequest.word")
-    fun getWordMeaning(wordMeaningRequest: WordMeaningRequest): WordDto? {
+    open fun getWordMeaning(wordMeaningRequest: WordMeaningRequest): WordDto? {
         val words = wordRepository.findAllByName(normalizeWord(wordMeaningRequest.word))
         if (words.isEmpty())
             return WordDto(

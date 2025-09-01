@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/api/v1/auth")
-class AuthenticationController(
+open class AuthenticationController(
     private val authenticationService: AuthenticationService,
 ) {
     @PostMapping(value = ["/register"], consumes = ["application/json"], produces = ["application/json"])

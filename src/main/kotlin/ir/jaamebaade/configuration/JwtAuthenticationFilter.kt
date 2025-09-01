@@ -15,7 +15,7 @@ import org.springframework.web.servlet.HandlerExceptionResolver
 import java.io.IOException
 
 @Component
-class JwtAuthenticationFilter (
+open class JwtAuthenticationFilter (
     private val jwtService: JwtService,
     private val userDetailsService: UserDetailsService,
 ) : OncePerRequestFilter(){

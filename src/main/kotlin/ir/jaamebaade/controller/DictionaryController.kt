@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController
 
 @RequestMapping("/api/v1/dictionary")
 @RestController
-class DictionaryController(private val dictionaryService: DictionaryService) {
+open class DictionaryController(private val dictionaryService: DictionaryService) {
     @PostMapping(value = ["/meaning"], consumes = ["application/json"], produces = ["application/json"])
     fun getWordMeaning(@RequestBody wordMeaningRequest: WordMeaningRequest): ResponseEntity<BaseResult> {
         val result =  dictionaryService.getWordMeaning(wordMeaningRequest)

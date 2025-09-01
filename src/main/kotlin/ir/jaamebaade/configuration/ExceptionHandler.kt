@@ -9,7 +9,7 @@ import org.springframework.web.context.request.WebRequest
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler
 
 @ControllerAdvice
-class ExceptionHandler : ResponseEntityExceptionHandler() {
+open class ExceptionHandler : ResponseEntityExceptionHandler() {
     @ExceptionHandler(RuntimeException::class)
     fun handleRunTimeException(ex: RuntimeException, request: WebRequest): ResponseEntity<Any> {
         logger.error("Unexpected Exception", ex)
