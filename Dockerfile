@@ -15,21 +15,25 @@ RUN mvn dependency:go-offline
 COPY src src
 
 # Builds the application and stores it in /target
-RUN mvn -DskipTests -Pnative native:compile
+RUN mvn package -DskipTests
 
 # A new stage so that we won't need maven in the final image
-# FROM registry.docker.ir/openjdk:21
-#
-# # Make application folder
-# RUN mkdir -p /app
-#
-# WORKDIR /app
-#
-# # Copy the jar file from the previous stage
-# COPY --from=build /workspace/target/*.jar app.jar
-#
-# # Set environment variables to define the location of application.properties
-# ENV SPRING_CONFIG_LOCATION=classpath:/application.properties,/app/config/application.properties
+FROM openjdk:21
+
+# Make application folder
+RUN mkdir -p /app
+
+WORKDIR /app
+
+# Copy the jar file from the previous stage
+COPY --from=build /workspace/target/*.jar app.jar
+
+# Add the application.properties file to the container
+COPY ./application.properties /app/config/application.properties
+
+# Set environment variables to define the location of application.properties
+ENV SPRING_CONFIG_LOCATION=classpath:/application.properties,/app/config/application.properties
+
 
 # Run the jar file
 ENTRYPOINT ["java","-jar","app.jar"]
