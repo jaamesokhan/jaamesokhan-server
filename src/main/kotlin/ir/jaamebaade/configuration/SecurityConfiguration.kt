@@ -29,6 +29,7 @@ open class SecurityConfiguration(
                 requests // Auth
                     .requestMatchers("/api/v1/auth/**").permitAll() // Other endpoints
                     .requestMatchers("/api/v1/poet/**").permitAll()
+                    .requestMatchers("/api/v1/recitations/**").permitAll()
                     .requestMatchers("/api/v1/dictionary/**").permitAll()
                     .requestMatchers("/api/v1/user/*").authenticated()
             }
@@ -42,4 +43,3 @@ open class SecurityConfiguration(
 
 
 }
-
