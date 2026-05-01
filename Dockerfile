@@ -1,39 +1,22 @@
-# Start with a base image containing Java runtime and Maven
-FROM maven:3.9-amazoncorretto-21-debian AS build
-
-# Make source folder
-RUN mkdir -p /workspace
+# Build the Spring Boot application with Gradle.
+FROM docker.arvancloud.ir/gradle:8.7-jdk21 AS build
 
 WORKDIR /workspace
 
-# Copy the pom.xml file and download dependencies
-COPY pom.xml ./
-RUN mvn dependency:go-offline
+COPY --chown=gradle:gradle settings.gradle.kts build.gradle.kts ./
+COPY --chown=gradle:gradle gradle gradle
+COPY --chown=gradle:gradle src src
 
+RUN gradle bootJar --no-daemon -x test
 
-# Copy the source code
-COPY src src
-
-# Builds the application and stores it in /target
-RUN mvn package -DskipTests
-
-# A new stage so that we won't need maven in the final image
-FROM openjdk:21
-
-# Make application folder
-RUN mkdir -p /app
+# Runtime image with only the JRE and the packaged application.
+FROM docker.arvancloud.ir/eclipse-temurin:21-jre
 
 WORKDIR /app
 
-# Copy the jar file from the previous stage
-COPY --from=build /workspace/target/*.jar app.jar
+COPY --from=build /workspace/build/libs/*.jar app.jar
+COPY src/main/resources/application.properties /app/config/application.properties
 
-# Add the application.properties file to the container
-COPY ./application.properties /app/config/application.properties
-
-# Set environment variables to define the location of application.properties
 ENV SPRING_CONFIG_LOCATION=classpath:/application.properties,/app/config/application.properties
 
-
-# Run the jar file
-ENTRYPOINT ["java","-jar","app.jar"]
+ENTRYPOINT ["java", "-jar", "app.jar"]
