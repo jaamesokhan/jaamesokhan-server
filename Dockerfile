@@ -7,7 +7,7 @@ COPY --chown=gradle:gradle settings.gradle.kts build.gradle.kts ./
 COPY --chown=gradle:gradle gradle gradle
 COPY --chown=gradle:gradle src src
 
-RUN gradle bootJar --no-daemon -x test
+RUN gradle bootJar --no-daemon -x test --info
 
 # Runtime image with only the JRE and the packaged application.
 FROM docker.arvancloud.ir/eclipse-temurin:21-jre
