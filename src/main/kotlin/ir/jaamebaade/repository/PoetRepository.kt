@@ -13,4 +13,6 @@ interface PoetRepository : PagingAndSortingRepository<Poet, Int> {
     fun findByNameContainsOrderById(name: String, pageable: Pageable): Page<Poet>
 
     fun findAllByOrderById(pageable: Pageable): Page<Poet>
+
+    fun findAllByIdIn(ids: Collection<Int>): List<Poet>
 }

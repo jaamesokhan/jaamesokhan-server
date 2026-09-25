@@ -1,2 +1,5 @@
 ### list poets
 GET http://localhost:8085/api/v1/poet?size=100
+
+### poet images
+GET http://localhost:8085/api/v1/poet/images?ids=1,2,3
