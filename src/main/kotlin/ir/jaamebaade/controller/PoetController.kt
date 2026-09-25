@@ -1,6 +1,7 @@
 package ir.jaamebaade.controller
 
 import ir.jaamebaade.dto.PoetDto
+import ir.jaamebaade.dto.PoetImageDto
 import ir.jaamebaade.service.PoetService
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -21,6 +22,11 @@ class PoetController(private val poetService: PoetService) {
     ): ResponseEntity<Page<PoetDto>> {
         val poetDtoList = poetService.listPoets(pageable, name)
         return ResponseEntity.ok(poetDtoList)
+    }
+
+    @GetMapping(value = ["/images"], produces = ["application/json"])
+    fun images(@RequestParam ids: List<Int>): ResponseEntity<List<PoetImageDto>> {
+        return ResponseEntity.ok(poetService.getPoetImages(ids))
     }
 
     @GetMapping(value = ["/download/{id}"])

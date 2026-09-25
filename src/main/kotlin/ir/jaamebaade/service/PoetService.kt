@@ -2,6 +2,7 @@ package ir.jaamebaade.service
 
 import io.minio.MinioClient
 import ir.jaamebaade.dto.PoetDto
+import ir.jaamebaade.dto.PoetImageDto
 import ir.jaamebaade.repository.PoetRepository
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.cache.annotation.Cacheable
@@ -31,6 +32,13 @@ open class PoetService(
         return poetDtoList
     }
 
+    // Not cached: clients use this to detect image_url changes made directly in the DB
+    fun getPoetImages(ids: List<Int>): List<PoetImageDto> {
+        require(ids.size <= MAX_IMAGE_IDS) { "At most $MAX_IMAGE_IDS ids are allowed" }
+        if (ids.isEmpty()) return emptyList()
+        return poetRepository.findAllByIdIn(ids.distinct()).map { PoetImageDto(id = it.id!!, imageUrl = it.imageUrl) }
+    }
+
     fun downloadPoet(poetId: Int): String {
         val prefix = "poet"
         // get resource form minio
@@ -46,5 +54,9 @@ open class PoetService(
         } catch (e: Exception) {
             throw RuntimeException("Error generating presigned URL", e)
         }
+    }
+
+    companion object {
+        const val MAX_IMAGE_IDS = 500
     }
 }
