@@ -25,6 +25,7 @@ open class SecurityConfiguration(
     open fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
         http
             .csrf { obj: CsrfConfigurer<HttpSecurity> -> obj.disable() }
+            .cors(Customizer.withDefaults())
             .authorizeHttpRequests { requests ->
                 requests // Auth
                     .requestMatchers("/api/v1/auth/**").permitAll() // Other endpoints

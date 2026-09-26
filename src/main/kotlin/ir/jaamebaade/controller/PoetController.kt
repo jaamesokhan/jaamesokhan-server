@@ -36,4 +36,13 @@ class PoetController(private val poetService: PoetService) {
         headers.location = URI(downloadUrl)
         return ResponseEntity(headers, HttpStatus.FOUND)
     }
+
+    /**
+     * Same presigned URL as [download], returned as JSON instead of a redirect, so browser
+     * clients can fetch the zip directly without following a cross-origin redirect.
+     */
+    @GetMapping(value = ["/download/{id}/url"], produces = ["application/json"])
+    fun downloadUrl(@PathVariable id: Int): ResponseEntity<Map<String, String>> {
+        return ResponseEntity.ok(mapOf("url" to poetService.downloadPoet(id)))
+    }
 }
