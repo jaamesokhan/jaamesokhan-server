@@ -11,8 +11,3 @@ services:
         POSTGRES_PASSWORD: jaamebaade_server_password
     volumes:
         - ./postgres-data:/var/lib/postgresql/data
-  redis:
-    image: registry.docker.ir/redis:7-alpine
-    container_name: redis
-    ports:
-      - "6379:6379"
